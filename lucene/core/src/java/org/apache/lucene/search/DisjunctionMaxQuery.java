@@ -117,18 +117,18 @@ public class DisjunctionMaxQuery extends Query implements Iterable<Query> {
     /** The Weights for our subqueries, in 1-1 correspondence with disjuncts */
     protected ArrayList<Weight> weights = new ArrayList<Weight>();  // The Weight's for our subqueries, in 1-1 correspondence with disjuncts
 
-    /** Construct the Weight for this Query searched by searcher.  Recursively construct subquery weights. */
+    /** Construct the Weight for this Query searched by searcher.  Recursively construct subquery weights. 用被搜索的查询来构造权重，循环构造子查询权重 */
     public DisjunctionMaxWeight(IndexSearcher searcher) throws IOException {
       for (Query disjunctQuery : disjuncts) {
         weights.add(disjunctQuery.createWeight(searcher));
       }
     }
 
-    /** Return our associated DisjunctionMaxQuery */
+    /** Return our associated(关联的) DisjunctionMaxQuery */
     @Override
     public Query getQuery() { return DisjunctionMaxQuery.this; }
 
-    /** Compute the sub of squared weights of us applied to our subqueries.  Used for normalization. */
+    /** Compute the sub of squared weights of us applied to our subqueries.  Used for normalization(标准化、正常化). */
     @Override
     public float getValueForNormalization() throws IOException {
       float max = 0.0f, sum = 0.0f;

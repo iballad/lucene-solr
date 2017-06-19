@@ -38,7 +38,7 @@ import org.apache.lucene.index.Term;
     <li> {@link TermRangeQuery}
     <li> {@link NumericRangeQuery}
     <li> {@link ConstantScoreQuery}
-    <li> {@link DisjunctionMaxQuery}
+    <li> {@link DisjunctionMaxQuery}  // dismax
     <li> {@link MatchAllDocsQuery}
     </ul>
     <p>See also the family of {@link org.apache.lucene.search.spans Span Queries}
