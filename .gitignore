@@ -1,4 +1,6 @@
 # .
+target/
+maven-build/
 /classes
 **/build
 /idea-build
@@ -11,9 +13,9 @@
 **/*.iml
 **/*.ipr
 **/*.iws
-/.project
-/.classpath
-/.settings
+.project
+.classpath
+.settings
 /.caches
 /prj.el
 /bin
