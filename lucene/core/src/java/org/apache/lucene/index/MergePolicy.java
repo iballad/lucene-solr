@@ -56,6 +56,8 @@ import org.apache.lucene.util.SetOnce;
  * TieredMergePolicy}.</p>
  *
  * @lucene.experimental
+ *
+ * 控制lucene如何合并段segment
  */
 public abstract class MergePolicy implements java.io.Closeable, Cloneable {
 

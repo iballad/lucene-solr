@@ -33,7 +33,9 @@ public final class KeywordTokenizer extends Tokenizer {
 
   private boolean done = false;
   private int finalOffset;
+  // 词相关属性
   private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+  // 位置相关属性
   private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
   
   public KeywordTokenizer(Reader input) {
@@ -55,7 +57,10 @@ public final class KeywordTokenizer extends Tokenizer {
     }
     termAtt.resizeBuffer(bufferSize);
   }
-  
+
+  /**
+   *  该方法遍历 Tokenizer 分析的词，若还存在词返回true，遍历待结尾返回false
+   */
   @Override
   public final boolean incrementToken() throws IOException {
     if (!done) {

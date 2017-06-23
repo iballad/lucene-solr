@@ -82,6 +82,16 @@ import org.apache.lucene.util.AttributeSource;
  * Therefore all non-abstract subclasses must be final or have at least a final
  * implementation of {@link #incrementToken}! This is checked when Java
  * assertions are enabled.
+ *
+ * TokeanStream API 的流程：
+ *  > 初始化 TokeanStream，TokeanStream增加属性到 AttributeSource
+ *  > 消费者调用 reset()
+ *  > 消费者从 TokeanStream 找属性，并吧它想要得到的值存在本地变量中
+ *  > 消费者调用 incrementTokean() 知道它返回 false, 每次调用后，消费属性值
+ *  > 消费者调用 end(), 以便只修流结束操作
+ *
+ *  当结束使用 TokeanStream 后， 消费者调用 close() 来释放资源
+ *
  */
 public abstract class TokenStream extends AttributeSource implements Closeable {
 
@@ -145,8 +155,10 @@ public abstract class TokenStream extends AttributeSource implements Closeable {
    * the attributes must be added during instantiation. Filters and consumers
    * are not required to check for availability of attributes in
    * {@link #incrementToken()}.
-   * 
-   * @return false for end of stream; true otherwise
+   *
+   * 该方法修改内部状态，然后通过相关的Attribute得到词本身，以及他所在的位置信息等。
+   *
+   * @return false for end of stream; true otherwise  [true 表示后面还有Tokean可以取；false 表示后面没有更多的Tokean了]
    */
   public abstract boolean incrementToken() throws IOException;
   
@@ -189,7 +201,7 @@ public abstract class TokenStream extends AttributeSource implements Closeable {
    */
   public void reset() throws IOException {}
   
-  /** Releases resources associated with this stream.
+  /** Releases resources associated with this stream. 释放资源
    * <p>
    * If you override this method, always call {@code super.close()}, otherwise
    * some internal state will not be correctly reset (e.g., {@link Tokenizer} will
