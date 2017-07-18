@@ -814,6 +814,7 @@ public abstract class TFIDFSimilarity extends Similarity {
     // combine them
     result.setValue(queryExpl.getValue() * fieldExpl.getValue());
 
+    // 当QueryWeight的得分为1的时候，得分解释explain不显示 QueryWeight
     if (queryExpl.getValue() == 1.0f)
       return fieldExpl;
 
