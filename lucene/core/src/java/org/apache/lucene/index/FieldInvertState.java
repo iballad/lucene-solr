@@ -22,7 +22,7 @@ import org.apache.lucene.util.AttributeSource;
 /**
  * This class tracks the number and position / offset parameters of terms
  * being added to the index. The information collected in this class is
- * also used to calculate the normalization factor for a field.
+ * also used to calculate the normalization factor（标准因子） for a field.
  * 
  * @lucene.experimental
  */

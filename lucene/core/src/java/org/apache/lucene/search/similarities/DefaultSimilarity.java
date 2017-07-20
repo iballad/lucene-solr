@@ -41,6 +41,26 @@ import org.apache.lucene.util.SmallFloat;
  * &nbsp;<br>
  * Last, note that search time is too late to modify this <i>norm</i> part of
  * scoring, e.g. by using a different {@link Similarity} for search.
+ *
+ * 参考<a>http://www.cnblogs.com/forfuture1978/archive/2010/02/08/1666137.html</a>
+ * 
+ * lucene的打分公式：
+ *
+ *  score(q,d)   =   (6)coord(q,d)  *  (3)queryNorm(q)  * ∑( (4)tf(t in d)  *  (5)idf(t)2  *  t.getBoost() *  (1)norm(t,d) )
+ *  t in q
+ *
+ *  norm(t,d)   =   doc.getBoost()  *  (2)lengthNorm(field)  *  ∏f.getBoost()
+ *  field f in d named as t
+ *
+ * lucene打分每一步对应的方法如下：
+ *  (1) float computeNorm(String field, FieldInvertState state)
+ *  (2) float lengthNorm(String fieldName, int numTokens)
+ *  (3) float queryNorm(float sumOfSquaredWeights)
+ *  (4) float tf(float freq)
+ *  (5) float idf(int docFreq, int numDocs)
+ *  (6) float coord(int overlap, int maxOverlap)
+ *  (7) float scorePayload(int docId, String fieldName, int start, int end, byte [] payload, int offset, int length)
+ *
  */
 public class DefaultSimilarity extends TFIDFSimilarity {
   
@@ -62,14 +82,17 @@ public class DefaultSimilarity extends TFIDFSimilarity {
     return overlap / (float)maxOverlap;
   }
 
-  /** Implemented as <code>1/sqrt(sumOfSquaredWeights)</code>. */
+  /** Implemented as <code>1/sqrt(sumOfSquaredWeights)</code>.
+   *
+   * 这是按照向量空间模型，对query向量的归一化。此值并不影响排序，而仅仅使得不同的query之间的分数可以比较
+   */
   @Override
   public float queryNorm(float sumOfSquaredWeights) {
     return (float)(1.0 / Math.sqrt(sumOfSquaredWeights));
   }
   
   /**
-   * Encodes a normalization factor for storage in an index.
+   * Encodes a normalization(标准) factor(因子) for storage in an index.
    * <p>
    * The encoding uses a three-bit mantissa, a five-bit exponent, and the
    * zero-exponent point at 15, thus representing values from around 7x10^9 to
@@ -88,7 +111,7 @@ public class DefaultSimilarity extends TFIDFSimilarity {
   }
 
   /**
-   * Decodes the norm value, assuming it is a single byte.
+   * Decodes the norm value, assuming(假设) it is a single byte.
    * 
    * @see #encodeNormValue(float)
    */
@@ -104,6 +127,18 @@ public class DefaultSimilarity extends TFIDFSimilarity {
    *  FieldInvertState#getLength()} - {@link
    *  FieldInvertState#getNumOverlap()}.
    *
+   *  主要计算文档长度的归一化，默认是 "1.0 / Math.sqrt(numTerms)", 因为默认的时候state.getBoost()=1.0;
+   *
+   *  为什么需要做归一化处理？因为有的文档较长，出现某个词的数目(即freq)较大，得分较高；而小文档的freq较小得分较小，但词出现的比例小文档比长文档更大，
+   *  所以这样对小文档是不公平的，所以此处除以文档的长度，以便减少因文档长度造成的打分不公；至于为什么要开平方根 Math.sqrt(numTerms)？这是更深
+   *  层次的考虑，此处不做深究
+   *
+   *  参考：<a>http://www.cnblogs.com/forfuture1978/archive/2010/02/08/1666137.html</a>
+   *
+   * state.getBoost()  是由创建索引时指定的field权重
+   * numTerms   代表term对应field的term总数（例如：title:lucene and solr分词之后是lucene|and|solr，那么numTerms就是3）
+   * Math.sqrt(numTerms) 对numTerms求平方根
+   *
    *  @lucene.experimental */
   @Override
   public float lengthNorm(FieldInvertState state) {
@@ -112,11 +147,12 @@ public class DefaultSimilarity extends TFIDFSimilarity {
       numTerms = state.getLength() - state.getNumOverlap();
     else
       numTerms = state.getLength();
-    // Math.sqrt(numTerms) 对numTerms求平方根
    return state.getBoost() * ((float) (1.0 / Math.sqrt(numTerms)));
   }
 
-  /** Implemented as <code>sqrt(freq)</code>. */
+  /** Implemented as <code>sqrt(freq)</code>.
+   * freq是指在一篇文档中包含的某个词的数目。tf是根据此数目给出的分数，默认为Math.sqrt(freq)。也即此项并不是随着包含的数目的增多而线性增加的
+   */
   @Override
   public float tf(float freq) {
     return (float)Math.sqrt(freq);
@@ -134,12 +170,16 @@ public class DefaultSimilarity extends TFIDFSimilarity {
     return 1;
   }
 
-  /** Implemented as <code>log(numDocs/(docFreq+1)) + 1</code>. */
+  /** Implemented as <code>log(numDocs/(docFreq+1)) + 1</code>.
+   *
+   *  Math.log(double a)  返回自然对数（以e为底）的一个double值
+   *  根据包含某个词的文档数以及总文档数计算出的分数
+   */
   @Override
   public float idf(long docFreq, long numDocs) {
     return (float)(Math.log(numDocs/(double)(docFreq+1)) + 1.0);
   }
-    
+
   /** 
    * True if overlap tokens (tokens with a position of increment of zero) are
    * discounted from the document's length.

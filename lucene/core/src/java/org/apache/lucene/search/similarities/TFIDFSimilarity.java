@@ -519,6 +519,8 @@ public abstract class TFIDFSimilarity extends Similarity {
    * larger values when the ratio between these parameters is large and smaller
    * values when the ratio between them is small.
    *
+   *  一次搜索可能包含多个搜索词，而一篇文档中也可能包含多个搜索词，此项表示，当一篇文档中包含的搜索词越多，则此文档则打分越高
+   *
    * @param overlap the number of query terms matched in the document
    * @param maxOverlap the total number of terms in the query
    * @return a score factor based on term overlap with the query
@@ -623,9 +625,9 @@ public abstract class TFIDFSimilarity extends Similarity {
    * implementations of this method usually return larger values for rare terms,
    * and smaller values for common terms.
    *
-   * @param docFreq the number of documents which contain the term
-   * @param numDocs the total number of documents in the collection
-   * @return a score factor based on the term's document frequency
+   * @param docFreq the number of documents which contain the term (包含term的文档数)
+   * @param numDocs the total number of documents in the collection (collection中的文档总数)
+   * @return a score factor based on the term's document frequency(频率)
    */
   public abstract float idf(long docFreq, long numDocs);
 
