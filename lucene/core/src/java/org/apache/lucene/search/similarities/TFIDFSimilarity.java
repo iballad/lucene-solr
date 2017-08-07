@@ -520,9 +520,10 @@ public abstract class TFIDFSimilarity extends Similarity {
    * values when the ratio between them is small.
    *
    *  一次搜索可能包含多个搜索词，而一篇文档中也可能包含多个搜索词，此项表示，当一篇文档中包含的搜索词越多，则此文档则打分越高
+   *  coord 即 coordination(协调)
    *
-   * @param overlap the number of query terms matched in the document
-   * @param maxOverlap the total number of terms in the query
+   * @param overlap the number of query terms matched in the document(检索命中query中term的个数)
+   * @param maxOverlap the total number of terms in the query(query中总共的term个数)
    * @return a score factor based on term overlap with the query
    */
   @Override

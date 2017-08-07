@@ -90,6 +90,10 @@ public final class FieldInvertState {
   }
   
   /**
+   * org.apache.lucene.analysis.Token#positionIncrement
+   * 这个字段决定当前token相对于上一个token的位置(当前token的位置就是上一个token位置的值与positionIncrement的值的和),它的作用主要体现在短语查询(phrase search)中
+   * <a>http://www.voidcn.com/blog/woaizhoulichao1/article/p-3377196.html</a>
+   *
    * Get the number of terms with <code>positionIncrement == 0</code>.
    * @return the numOverlap
    */
