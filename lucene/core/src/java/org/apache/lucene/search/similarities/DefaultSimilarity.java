@@ -172,6 +172,12 @@ public class DefaultSimilarity extends TFIDFSimilarity {
 
   /** Implemented as <code>log(numDocs/(docFreq+1)) + 1</code>.
    *
+   * @param docFreq the number of documents which contain the term (包含term的文档数)
+   *                 某个词或短语在一篇文章中出现的次数越多，越相关
+   *
+   * @param numDocs the total number of documents in the collection (collection中的文档总数)
+   *                 (maxDocs)整个文档集合中包含某个词的文档数量越少，这个词越重要
+   *
    *  Math.log(double a)  返回自然对数（以e为底）的一个double值
    *  根据包含某个词的文档数以及总文档数计算出的分数
    */
